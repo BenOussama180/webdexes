@@ -1,0 +1,31 @@
+{
+    "name": "webdexs",
+    "version": "0.1.0",
+    "description": "digital agency website made with tailwindcss and alpinejs.",
+    "author": {
+        "name": "Oussama Bendriss",
+        "email": "oussama.bendriss@outlook.com"
+    },
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "serve": "vite preview",
+        "deploy": "gh-pages -d dist"
+    },
+    "devDependencies": {
+        "autoprefixer": "^10.4.13",
+        "gh-pages": "^3.2.3",
+        "postcss": "^8.4.18",
+        "tailwindcss": "^3.2.2",
+        "vite": "^2.4.2"
+    },
+    "dependencies": {
+        "alpinejs": "^3.2.2",
+        "gsap": "^3.7.1"
+    },
+    "prettier": {
+        "semi": false,
+        "singleQuote": true,
+        "printWidth": 120
+    }
+}

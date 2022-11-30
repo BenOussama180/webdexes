@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Webdexs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet" />
+    <style>
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            display: flex;
+            z-index: 9000000000000;
+            overflow: hidden;
+        }
+
+        .loading .left {
+            background-color: #ffffff;
+            width: 100%;
+            height: 100%;
+        }
+
+        .loading .right {
+            background-color: #ffffff;
+            width: 100%;
+            height: 100%;
+        }
+
+        .loading .logo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading .logo svg {
+            height: 50vh;
+        }
+
+        .flickity-viewport {
+            height: 500px !important;
+        }
+    </style>
+</head>
+
+<body style="overflow-x: hidden">
+    <!-- Loading -->
+    <div class="loading">
+        <div class="left"></div>
+        <div class="right"></div>
+        <div class="logo">
+            <img src="./src/images/logoo-black-1.svg" alt="" class="h-32" />
+        </div>
+    </div>
+
+    <div x-data="mainState" class="overflow-x-hidden" :class="{ dark: !isDark }">
+        <div class="font-sans antialiased text-gray-900 bg-gray-50 dark:bg-black dark:text-gray-200">
+            <!-- Navbar -->
+            <nav x-data="navbarState"
+                class="fixed inset-x-0 bottom-0 z-20 transition-all duration-500 md:top-0 md:bottom-auto" :class="{ 'shadow-t-lg md:shadow-lg bg-white dark:bg-gray-700 translate-y-full md:-translate-y-full':
+        scrollingDown,
+        'shadow-t-lg md:shadow-lg bg-white dark:bg-black': scrollingUp }">
+                <div class="relative flex flex-row-reverse items-center justify-between p-4 mx-auto bg-white max-w-7xl md:flex-row md:h-24 md:bg-transparent dark:bg-gray-700 md:dark:bg-transparent"
+                    :class="{ 'shadow-t-lg': isMobileMenuOpen }">
+                    <!-- Mobile menu button -->
+                    <button @click="toggleMobileMenu" class="md:hidden">
+                        <span class="sr-only">Toggle navigation menu</span>
+                        <svg aria-hidden="true" class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                            viewBox="0 0 24 24">
+                            <!-- Menu icon path -->
+                            <path x-show="!isMobileMenuOpen" d="M4 6H20V8H4zM8 11H20V13H8zM13 16H20V18H13z"></path>
+                            <!-- X icon path -->
+                            <path x-show="isMobileMenuOpen"
+                                d="M16.192 6.344L11.949 10.586 7.707 6.344 6.293 7.758 10.535 12 6.293 16.242 7.707 17.656 11.949 13.414 16.192 17.656 17.606 16.242 13.364 12 17.606 7.758z">
+                            </path>
+                        </svg>
+                    </button>
+
+                    <!-- Logo -->
+                    <a href="#" class="inline-block rounded-md">
+                        <span class="sr-only">Webdexs</span>
+                        <img src="./src/images/logo-black.svg" alt="" class="w-32 h-auto text-belle-flower" />
+                    </a>
+
+                    <!-- Navigation links -->
+                    <ul class="items-center hidden space-x-6 md:flex" x-data="navbarLinksState">
+                        <template x-for="link in navigationLinks">
+                            <li>
+                                <a :href="link.link" @mouseenter="handelMouseEnter($el)"
+                                    @mouseleave="handelMouseLeave($el)"
+                                    class="inline-block px-4 py-2 text-gray-500 transition-colors rounded-md hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 focus-visible:outline-none focus-visible:ring focus-visible:ring-belle-flower"
+                                    :class="{'text-black ': scrollingUp}">
+                                    <div class="overflow-hidden">
+                                        <span x-text="link.label"></span>
+                                        <div aria-hidden="true" x-ref="underlineLink"
+                                            class="underline-link h-0.5 w-full bg-deep-blue dark:bg-light-gray translate-x-[102%]"
+                                            :class="{'bg-white ': scrollingUp}"></div>
+                                    </div>
+                                </a>
+                            </li>
+                        </template>
+                    </ul>
+
+                    <!-- Dark mode button -->
+                    <button @click="toggleTheme"
+                        class="text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400">
+                        <span class="sr-only">Toggle dark mode</span>
+                        <svg aria-hidden="true" class="w-8 h-8" :class="{'text-white ': scrollingUp}"
+                            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                            <!-- Moon path -->
+                            <path x-show="isDark"
+                                d="M20.742,13.045c-0.677,0.18-1.376,0.271-2.077,0.271c-2.135,0-4.14-0.83-5.646-2.336c-2.008-2.008-2.799-4.967-2.064-7.723 c0.092-0.345-0.007-0.713-0.259-0.965C10.444,2.04,10.077,1.938,9.73,2.034C8.028,2.489,6.476,3.382,5.241,4.616 c-3.898,3.898-3.898,10.243,0,14.143c1.889,1.889,4.401,2.93,7.072,2.93c2.671,0,5.182-1.04,7.07-2.929 c1.236-1.237,2.13-2.791,2.583-4.491c0.092-0.345-0.008-0.713-0.26-0.965C21.454,13.051,21.085,12.951,20.742,13.045z M17.97,17.346c-1.511,1.511-3.52,2.343-5.656,2.343c-2.137,0-4.146-0.833-5.658-2.344c-3.118-3.119-3.118-8.195,0-11.314 c0.602-0.602,1.298-1.102,2.06-1.483c-0.222,2.885,0.814,5.772,2.89,7.848c2.068,2.069,4.927,3.12,7.848,2.891 C19.072,16.046,18.571,16.743,17.97,17.346z">
+                            </path>
+
+                            <!-- Sun paths -->
+                            <g x-show="!isDark">
+                                <path
+                                    d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19H12.998V22H10.998zM10.998 2H12.998V5H10.998zM1.998 11H4.998V13H1.998zM18.998 11H21.998V13H18.998z">
+                                </path>
+                                <path transform="rotate(-45.017 5.986 18.01)" d="M4.487 17.01H7.487V19.01H4.487z">
+                                </path>
+                                <path transform="rotate(-45.001 18.008 5.99)" d="M16.508 4.99H19.509V6.99H16.508z">
+                                </path>
+                                <path transform="rotate(-134.983 5.988 5.99)" d="M4.487 4.99H7.487V6.99H4.487z"></path>
+                                <path transform="rotate(134.999 18.008 18.01)"
+                                    d="M17.008 16.51H19.008V19.511000000000003H17.008z"></path>
+                            </g>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Mobile navigation links -->
+                <ul id="mobileMenu" x-data="navbarLinksState"
+                    class="h-0 overflow-hidden bg-white dark:bg-gray-900 md:hidden">
+                    <div class="py-4">
+                        <template x-for="link in navigationLinks">
+                            <li>
+                                <a :href="link.link" x-text="link.label"
+                                    class="block px-4 py-2 text-gray-600 dark:text-gray-400"></a>
+                            </li>
+                        </template>
+                    </div>
+                </ul>
+            </nav>
+
+            <main>
+                <h1 class="sr-only">Webdexs</h1>
+
+                <section x-data="introSectionState" class="relative min-h-screen bg-center bg-no-repeat bg-cover intro">
+                    <img src="./src/images/Vector-1.svg" class="absolute w-3/4 scale-150 h-4/5" />
+                    <div class="relative pb-24 mx-auto md:pt-24 max-w-7xl">
+                        <div class="flex flex-row items-center justify-end pt-20 space-y-10 pb-18">
+                            <div class="w-1/2">
+                                <h2
+                                    class="text-5xl font-extrabold leading-snug text-left text-white uppercase drop-shadow-lg shadow-black dark:shadow-white">
+                                    We help our client <br />
+                                    invent their <br />
+                                    future
+                                </h2>
+                                <a href="#"
+                                    class="absolute flex items-center justify-start max-w-xl mt-2 text-xl font-medium text-center text-white underline uppercase cursor-pointer md:text-xl">
+                                    Get Started
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75" />
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="w-1/2">
+                                <img src="./src/images/hero-img.png" />
+                            </div>
+                        </div>
+
+                        <!-- <div
+                                x-ref="showCase"
+                                class="relative flex items-center justify-center origin-bottom pointer-events-none select-none dashboard-showcase md:px-20 md:-mt-20 opacity-30"
+                            >
+                                <img class="" src="src/images/Frame.svg" alt="" />
+                            </div> -->
+                    </div>
+
+                    <div class="absolute w-full p-16 mx-auto bg-light-gray">
+                        <div class="flex items-center justify-center space-x-10">
+                            <div class="w-1/2 text-3xl text-right text-black">
+                                A full service agency focused <br />on Strategy Media <br />Content and Design
+                            </div>
+                            <div class="w-1/2 text-2xl text-left text-black leading-0">
+                                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
+                                Ipsum has been the industry's standard dummy text ever since the 1500s <br />
+                                <span class="underline cursor-pointer text-deep-blue">Agency Info</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="text-white bg-gray-50 dark:bg-black">
+                    <div class="max-w-screen-xl px-4 py-16 mx-auto sm:px-6 lg:px-8">
+                        <div class="max-w-lg mx-auto text-center">
+                            <h2 class="text-3xl font-bold sm:text-4xl">Services</h2>
+
+                            <p class="mt-4 text-gray-300">
+                                Our Services For Clients.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-8 mt-8 md:grid-cols-2 lg:grid-cols-3" x-data="servicesState">
+                            <template x-for="service in servicesCards">
+                                <a
+                                    class="block p-8 transition duration-500 ease-in-out transform border border-gray-800 shadow-md rounded-xl hover:border-white hover:shadow-white hover:-translate-y-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                                        <path
+                                            d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                                    </svg>
+                                    <h2 class="mt-4 text-xl font-bold text-white uppercase" x-text="service.title"></h2>
+                                    <p class="mt-1 text-sm text-gray-300" x-text="service.body">
+                                    </p>
+                                </a>
+                            </template>
+                        </div>
+
+                        <div class="mt-12 text-center">
+                            <a href="#"
+                                class="inline-flex items-center px-8 py-3 mt-8 text-black bg-white border border-white rounded hover:bg-transparent focus:outline-none focus:ring active:text-red-500 hover:text-white">
+                                <span class="text-sm font-medium"> Get Started </span>
+
+                                <svg class="w-5 h-5 ml-3" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+                <section class="text-white  bg-gray-50 dark:bg-black">
+                    <div class="max-w-screen-xl px-4 py-16 mx-auto sm:px-6 lg:px-8">
+                        <div class="max-w-lg mx-auto text-center">
+                            <h2 class="text-3xl font-bold sm:text-4xl">Works</h2>
+
+                            <p class="mt-4 text-gray-300">
+                                Our Works For Clients.
+                            </p>
+
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+
+            <footer class="bg-gray-100 dark:bg-black">
+                <div
+                    class="flex flex-col items-center p-6 mx-auto space-y-4 text-gray-500 md:space-y-0 md:flex-row md:justify-between max-w-7xl">
+                    <a href="#"
+                        class="transition-all hover:-rotate-12 hover:scale-105 hover:text-gray-800 dark:hover:text-gray-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-8 h-8">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+                        </svg>
+                    </a>
+                    <p class="flex items-center justify-center space-x-1 text-sm">
+                        <span>lorem</span>
+                        <span>
+                            <span class="sr-only">ipsum</span>
+                            <svg aria-hidden="true" class="w-5 h-5 text-red-600" xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M20.205,4.791c-1.137-1.131-2.631-1.754-4.209-1.754c-1.483,0-2.892,0.552-3.996,1.558 c-1.104-1.006-2.512-1.558-3.996-1.558c-1.578,0-3.072,0.623-4.213,1.758c-2.353,2.363-2.352,6.059,0.002,8.412L12,21.414 l8.207-8.207C22.561,10.854,22.562,7.158,20.205,4.791z">
+                                </path>
+                            </svg>
+                        </span>
+                        <span>ipsum</span>
+                        <a class="text-blue-500 hover:underline"> dolor sit amet </a>
+                    </p>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script type="module" src="/src/js/main.js"></script>
+</body>
+
+</html>
+
+<!-- CTA buttons -->
+<!-- <div class="relative z-10 flex items-center justify-center w-full space-x-6">
+                                    <button
+                                        class="relative inline-block overflow-hidden border-2 rounded-md border-belle-flower group focus:outline-none focus:ring focus:ring-belle-flower focus:ring-offset-1 dark:focus:ring-offset-gray-800"
+                                    >
+                                        <div class="absolute inset-0 flex items-center">
+                                            <div
+                                                class="w-1/2 h-full transition-all bg-belle-flower group-hover:-translate-x-full"
+                                            ></div>
+                                            <div
+                                                class="w-1/2 h-full transition-all bg-belle-flower group-hover:translate-x-full"
+                                            ></div>
+                                        </div>
+                                        <span
+                                            class="relative inline-block px-4 py-2 text-white transition-colors group-hover:text-purple-600 dark:group-hover:text-white"
+                                        >
+                                            Contact us
+                                        </span>
+                                    </button>
+                                    <button
+                                        class="relative inline-block overflow-hidden border-2 rounded-md border-belle-flower group focus:outline-none focus:ring focus:ring-belle-flower focus:ring-offset-1 dark:focus:ring-offset-gray-800"
+                                    >
+                                        <div class="absolute inset-0 flex items-center">
+                                            <div
+                                                class="w-1/2 h-full transition-all -translate-x-full bg-belle-flower group-hover:translate-x-0"
+                                            ></div>
+                                            <div
+                                                class="w-1/2 h-full transition-all translate-x-full bg-belle-flower group-hover:translate-x-0"
+                                            ></div>
+                                        </div>
+                                        <span
+                                            class="relative inline-block px-4 py-2 text-gray-900 transition-colors dark:text-white group-hover:text-white"
+                                        >
+                                            About us
+                                        </span>
+                                    </button>
+                                </div> -->
